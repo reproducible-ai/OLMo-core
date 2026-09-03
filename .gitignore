@@ -61,23 +61,9 @@ site/
 core
 /dataset-cache/
 
-# roar state — the generated setup stage runs `roar init`, which creates
-# .roar/. Without this rule the worktree goes dirty and the FIRST PAID
-# `roar run` refuses to execute ("Run blocked: untracked files").
+# Local lineage state is not a source artifact.
 .roar/
-# --- reproduction outputs (scaffold_row.py: mnist rule) ---
-# file-pattern ignore + tracked .gitkeep so each dir survives a clean
-# checkout and roar keeps the outputs in lineage. NEVER dir-ignore.
-#
-# Each output dir is re-included one path component at a time before its
-# contents are ignored. git cannot re-include a file whose PARENT DIRECTORY
-# is excluded — it never descends — so a bare `!<dir>/.gitkeep` is dead text
-# under an upstream `<dir>/` rule, and every .gitkeep silently goes
-# unreachable while this tool reports success. Row 022 hit exactly that:
-# upstream ignored `datasets/` and `checkpoints/`, so all 7 .gitkeep files
-# were unreachable and roar would have dropped the outputs. Re-including
-# each ancestor and immediately re-ignoring its contents keeps sibling
-# paths ignored, so this stays safe when nothing shadows the dir.
+# Preserve empty output directories while ignoring generated contents.
 !data/
 data/*
 !outputs/
