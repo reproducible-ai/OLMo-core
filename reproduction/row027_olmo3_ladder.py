@@ -1,8 +1,8 @@
 """One-GPU capture of the upstream OLMo 3 scaling-ladder 3B rung.
 
 The model and optimizer come from OLMo-core's published ladder. This adapter makes
-the topology and bounded-run changes needed for a single 96 GB accelerator and
-prepares a deterministic subset of Ai2's public Dolma 3 training mix.
+the topology and bounded-run changes used on one RTX PRO 6000 Blackwell Server
+Edition and prepares a deterministic subset of Ai2's public Dolma 3 training mix.
 """
 
 import argparse
