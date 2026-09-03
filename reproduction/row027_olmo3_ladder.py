@@ -117,7 +117,7 @@ def train(data: Path, output_dir: Path) -> None:
         dir=str(output_dir),
         sizes=["3B"],
         max_devices=1,
-        device_type="NVIDIA B200",
+        device_type="NVIDIA RTX PRO 6000 Blackwell Server Edition (B200 compatibility)",
         model_configurator=OneGpuOlmo3Configurator(rank_microbatch_size=SEQUENCE_LENGTH),
         run_configurator=OneStepRunConfigurator(chinchilla_multiple=4.0),
         sequence_length=SEQUENCE_LENGTH,
