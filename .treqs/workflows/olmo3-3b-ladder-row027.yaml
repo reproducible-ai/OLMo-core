@@ -26,7 +26,7 @@ setup:
     /usr/local/bin/uv venv --python /opt/pytorch/bin/python /opt/row027-venv
     test -f /opt/row027-venv/pyvenv.cfg
     grep -qx 'include-system-site-packages = false' /opt/row027-venv/pyvenv.cfg
-    /usr/local/bin/uv pip install --python /opt/row027-venv/bin/python . torch==2.13.0 transformers==5.16.1 trackio==0.37.0 zstandard==0.25.0
+    /usr/local/bin/uv pip install --python /opt/row027-venv/bin/python '.[beaker]' torch==2.13.0 transformers==5.16.1 trackio==0.37.0 zstandard==0.25.0
     env PATH=/usr/local/bin:/usr/bin:/bin roar --version
     roar --version
     roar tracer use preload
