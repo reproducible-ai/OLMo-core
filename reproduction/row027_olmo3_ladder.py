@@ -8,6 +8,7 @@ prepares a deterministic subset of Ai2's public Dolma 3 training mix.
 import argparse
 import io
 import json
+import tarfile
 from pathlib import Path
 
 import numpy as np
@@ -133,6 +134,34 @@ def train(data: Path, output_dir: Path) -> None:
     ladder.run("3B")
 
 
+def package_checkpoint(checkpoint: Path, output: Path) -> None:
+    paths = sorted(checkpoint.rglob("*"), key=lambda path: path.as_posix())
+    if not paths:
+        raise RuntimeError(f"checkpoint directory is empty: {checkpoint}")
+    output.parent.mkdir(parents=True, exist_ok=True)
+    expected_members: list[str] = []
+    with tarfile.open(output, mode="w", format=tarfile.PAX_FORMAT) as archive:
+        for path in paths:
+            archive_name = path.relative_to(checkpoint.parent).as_posix()
+            info = archive.gettarinfo(path, arcname=archive_name)
+            info.mtime = 0
+            info.uid = 0
+            info.gid = 0
+            info.uname = ""
+            info.gname = ""
+            expected_members.append(archive_name)
+            if path.is_file():
+                with path.open("rb") as source:
+                    archive.addfile(info, source)
+            else:
+                archive.addfile(info)
+    with tarfile.open(output, mode="r") as archive:
+        actual_members = archive.getnames()
+    if actual_members != expected_members:
+        raise RuntimeError("checkpoint archive member verification failed")
+    print(f"packaged {len(actual_members)} checkpoint entries into {output}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -143,11 +172,16 @@ def main() -> None:
     run = subparsers.add_parser("train")
     run.add_argument("--data", type=Path, required=True)
     run.add_argument("--output-dir", type=Path, required=True)
+    package = subparsers.add_parser("package-checkpoint")
+    package.add_argument("--checkpoint", type=Path, required=True)
+    package.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     if args.command == "prepare-data":
         prepare_data(args.output, args.manifest, args.num_tokens)
-    else:
+    elif args.command == "train":
         train(args.data, args.output_dir)
+    else:
+        package_checkpoint(args.checkpoint, args.output)
 
 
 if __name__ == "__main__":

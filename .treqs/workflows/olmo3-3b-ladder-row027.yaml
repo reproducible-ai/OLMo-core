@@ -52,10 +52,19 @@ train:
     roar run -n train -- python -m torch.distributed.run --standalone --nproc-per-node=1 reproduction/row027_olmo3_ladder.py train --data data/dolma3_tokens.npy --output-dir outputs
   trace: off
 
+package_checkpoint:
+  command: |
+    export PATH=/opt/pytorch/bin:$PATH
+    export PATH=/opt/row027-venv/bin:$PATH
+
+    export PYTHONUNBUFFERED=1
+    roar run -n package_checkpoint -- python reproduction/row027_olmo3_ladder.py package-checkpoint --checkpoint outputs/3B/step1 --output artifacts/olmo3-3b-step1.tar
+  trace: off
+
 label:
   command: |
     export PATH=/opt/pytorch/bin:$PATH
-    roar label set artifact outputs/3B/step1 model.name=olmo3-3b-ladder-row027 model.version=3B license.id=Apache-2.0 license.name='Apache License 2.0' description='OLMo 3 scaling-ladder 3B rung trained from scratch for one optimizer step on a public Dolma 3 subset.' documentation.url=https://github.com/allenai/OLMo-core/blob/92870a33c3fee060d57c3faec52b0b369ece85a6/src/scripts/train/ladder/olmo3_ladder.py
+    roar label set artifact artifacts/olmo3-3b-step1.tar model.name=olmo3-3b-ladder-row027 model.version=3B license.id=Apache-2.0 license.name='Apache License 2.0' description='OLMo 3 scaling-ladder 3B rung trained from scratch for one optimizer step on a public Dolma 3 subset.' documentation.url=https://github.com/allenai/OLMo-core/blob/92870a33c3fee060d57c3faec52b0b369ece85a6/src/scripts/train/ladder/olmo3_ladder.py
   trace: off
 
 publish:
@@ -64,5 +73,5 @@ publish:
   command: |
     export PATH=/opt/pytorch/bin:$PATH
     roar status --untracked-dirs
-    roar put outputs/3B/step1 outputs/3B/metrics_step1.json hf://reproducible-ai/olmo3-3b-ladder-row027 --public --yes --no-tag -m "OLMo 3 3B scaling-ladder checkpoint after a one-step bounded run; not converged."
+    roar put artifacts/olmo3-3b-step1.tar outputs/3B/metrics_step1.json hf://reproducible-ai/olmo3-3b-ladder-row027 --public --yes --no-tag -m "OLMo 3 3B scaling-ladder checkpoint after a one-step bounded run; not converged."
   trace: off

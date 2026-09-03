@@ -87,3 +87,6 @@ outputs/3B/*
 !data/.gitkeep
 !outputs/.gitkeep
 !outputs/3B/.gitkeep
+!artifacts/
+artifacts/*
+!artifacts/.gitkeep
