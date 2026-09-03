@@ -26,7 +26,7 @@ setup:
     /usr/local/bin/uv venv --python /opt/pytorch/bin/python /opt/row027-venv
     test -f /opt/row027-venv/pyvenv.cfg
     grep -qx 'include-system-site-packages = false' /opt/row027-venv/pyvenv.cfg
-    /usr/local/bin/uv pip install --python /opt/row027-venv/bin/python '.[beaker]' torch==2.13.0 transformers==5.16.1 trackio==0.37.0 zstandard==0.25.0
+    /usr/local/bin/uv pip install --python /opt/row027-venv/bin/python '.[beaker]' torch==2.13.0 transformers==5.16.1 zstandard==0.25.0
     env PATH=/usr/local/bin:/usr/bin:/bin roar --version
     roar --version
     roar tracer use preload
@@ -39,8 +39,8 @@ prepare_data:
     export PATH=/opt/pytorch/bin:$PATH
     export PATH=/opt/row027-venv/bin:$PATH
 
-    export TRACKIO_SPACE_ID=reproducible-ai/experiments PYTHONUNBUFFERED=1
-    roar run -n prepare_data --wandb-to-trackio -- python reproduction/row027_olmo3_ladder.py prepare-data --output data/dolma3_tokens.npy --manifest data/manifest.json --num-tokens 32768
+    export PYTHONUNBUFFERED=1
+    roar run -n prepare_data -- python reproduction/row027_olmo3_ladder.py prepare-data --output data/dolma3_tokens.npy --manifest data/manifest.json --num-tokens 32768
   trace: off
 
 train:
@@ -48,8 +48,8 @@ train:
     export PATH=/opt/pytorch/bin:$PATH
     export PATH=/opt/row027-venv/bin:$PATH
 
-    export TRACKIO_SPACE_ID=reproducible-ai/experiments PYTHONUNBUFFERED=1
-    roar run -n train --wandb-to-trackio -- env TRACKIO_SPACE_ID=reproducible-ai/experiments python -m torch.distributed.run --standalone --nproc-per-node=1 reproduction/row027_olmo3_ladder.py train --data data/dolma3_tokens.npy --output-dir outputs
+    export PYTHONUNBUFFERED=1
+    roar run -n train -- python -m torch.distributed.run --standalone --nproc-per-node=1 reproduction/row027_olmo3_ladder.py train --data data/dolma3_tokens.npy --output-dir outputs
   trace: off
 
 label:

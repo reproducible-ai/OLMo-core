@@ -104,6 +104,7 @@ def train(data: Path, output_dir: Path) -> None:
             trainer = super()._configure_trainer(size_spec, for_benchmarking)
             trainer.callbacks["lm_evaluator"].enabled = False
             trainer.callbacks["downstream_evaluator"].enabled = False
+            trainer.callbacks["wandb"].enabled = False
             trainer.callbacks["checkpointer"].pre_train_checkpoint = False
             trainer.callbacks["checkpointer"].save_async = False
             return trainer
